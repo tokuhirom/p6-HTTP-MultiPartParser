@@ -40,7 +40,7 @@ for 1..12 {
                     };
                     @got.push($part);
 
-                    $headers = Mu;
+                    $headers = Nil;
                     $body = Blob.new;
                 }
             },
