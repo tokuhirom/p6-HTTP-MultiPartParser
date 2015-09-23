@@ -24,10 +24,12 @@ has State $!state = PREAMBLE;
 has Blob $.boundary;
 has Blob $!buffer .= new;
 has Sub $.on_header is required;
-has Sub $.on_error = sub ($err) { die($err) };
+has Sub $.on_error is required;
 has Sub $.on_body is required;
 has Bool $!finish = False;
+has Bool $!aborted = False;
 
+has int $.max_preamble_size = 32 * 1024;
 has int $.max_header_size = 32768;
 
 has Blob $!boundary-begin = HYPENHYPEN ~ self.boundary;
@@ -51,9 +53,19 @@ my multi sub index(Blob $buffer, Blob $substr) {
     return -1; # not found
 }
 
+method !err(Str $msg) {
+    $!aborted = True;
+    $.on_error.($msg);
+}
+
 method !parse_preamble() {
     my int $index = index($!buffer, $!boundary-begin);
     if ( $index < 0 ) {
+        if ($!buffer.bytes > $.max_preamble_size) {
+            self!err(q/Size of preamble exceeds maximum allowed/);
+            return False;
+        }
+        $!finish && self!err(q/End of stream encountered while parsing preamble/);
         return False;
     }
 
@@ -67,7 +79,7 @@ method !parse_preamble() {
 
 method !parse_boundary() returns Bool {
     if ($!buffer.bytes < 2) {
-        $!finish && $.on_error.(q/End of stream encountered while parsing boundary/);
+        $!finish && self!err(q/End of stream encountered while parsing boundary/);
         return False;
     } elsif ($!buffer.subbuf(0, 2) eq CRLF) {
         $!buffer = $!buffer.subbuf(2);
@@ -75,19 +87,19 @@ method !parse_boundary() returns Bool {
         return True;
     } elsif ($!buffer.subbuf(0, 2) eq HYPENHYPEN) {
         if ($!buffer.bytes < 4) {
-            $!finish && $.on_error.(q/End of stream encountered while parsing closing boundary/);
+            $!finish && self!err(q/End of stream encountered while parsing closing boundary/);
             return False;
         } elsif ($!buffer.subbuf(2, 2) eq CRLF) {
             $!buffer = $!buffer.subbuf(4);
             $!state = EPILOGUE;
             return True;
         } else {
-            $.on_error.(q/Closing boundary does not terminate with CRLF/);
+            self!err(q/Closing boundary does not terminate with CRLF/);
             return False;
         }
     }
     else {
-        $.on_error.(q/Boundary does not terminate with CRLF or hyphens/);
+        self!err(q/Boundary does not terminate with CRLF or hyphens/);
         return False;
     }
 }
@@ -96,10 +108,10 @@ method !parse_header() {
     my $index = index( $!buffer, CRLF ~ CRLF);
     if ($index < 0) {
         if ($!buffer.bytes > $.max_header_size) {
-            $.on_error.(q/Size of part header exceeds maximum allowed/);
+            self!err(q/Size of part header exceeds maximum allowed/);
             return False;
         }
-        $!finish && $.on_error.(q/End of stream encountered while parsing part header/);
+        $!finish && self!err(q/End of stream encountered while parsing part header/);
         return False;
     }
 
@@ -112,7 +124,7 @@ method !parse_header() {
             @headers.push($_);
         } elsif /^<[\x09\x20]>+(.*?)$/ {
             if !@headers {
-                $.on_error.(q/Continuation line seen before first header/);
+                self!err(q/Continuation line seen before first header/);
                 return False;
             }
             my $value = $/[0].Str;
@@ -120,7 +132,7 @@ method !parse_header() {
             @headers[*-1] ~= ' ' unless @headers[*-1] ~~ /<[\x09\x20]>$/;
             @headers[*-1] ~= $value;
         } else {
-            $.on_error.(q/Malformed header line/);
+            self!err(q/Malformed header line/);
             return False;
         }
     }
@@ -133,7 +145,7 @@ method !parse_header() {
 #       if $header ~~ /^(<field-name>)<[\t ]>*\:<[\t ]>*(.*?)$/ {
 #           @results.push(($/[0].Str.lc => $/[1].Str.trim));
 #       } else {
-#           $.on_error.("Malformed header line");
+#           self!err("Malformed header line");
 #       }
 #   }
     $.on_header.(@headers);
@@ -153,7 +165,7 @@ method !parse_body() {
     if ($take < 0) {
         $take = $!buffer.bytes - (6 + $.boundary.bytes);
         if ($take <= 0) {
-            $!finish && $.on_error.(q/End of stream encountered while parsing part body/);
+            $!finish && self!err(q/End of stream encountered while parsing part body/);
             return False;
         }
     } else {
@@ -180,13 +192,13 @@ method !parse_body() {
 # ending multipart boundary.
 method !parse_epilogue() {
     if $!buffer.bytes != 0 {
-        $.on_error.(q/Nonempty epilogue/);
+        self!err(q/Nonempty epilogue/);
     }
     return False;
 }
 
 method parse() {
-    loop {
+    while ! $!aborted {
         debug($!state);
 
         given $!state {
@@ -208,6 +220,7 @@ method parse() {
             default { die "Illegal state" }
         }
     }
+    return !$!aborted;
 }
 
 method add(Blob $buf) {
