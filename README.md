@@ -1,7 +1,9 @@
+[![Build Status](https://travis-ci.org/tokuhirom/p6-HTTP-MultipartParser.svg?branch=master)](https://travis-ci.org/tokuhirom/p6-HTTP-MultipartParser)
+
 NAME
 ====
 
-HTTP::MultiPartParser - blah blah blah
+HTTP::MultiPartParser - low level multipart/form-data parser
 
 SYNOPSIS
 ========
@@ -11,11 +13,19 @@ SYNOPSIS
 DESCRIPTION
 ===========
 
-HTTP::MultiPartParser is ...
+HTTP::MultiPartParser is low level multipart/form-data parser library.
+
+This library is port of chansen's HTTP::MultiPartParser for Perl5.
 
 COPYRIGHT AND LICENSE
 =====================
 
-Copyright 2015 Tokuhiro Matsuno <tokuhirom@gmail.com>
+    Copyright 2015 Tokuhiro Matsuno <tokuhirom@gmail.com>
 
-This library is free software; you can redistribute it and/or modify it under the Artistic License 2.0.
+    This library is free software; you can redistribute it and/or modify it under the Artistic License 2.0.
+
+And oritinal perl5's HTTP::MutlipartParser is
+
+    Copyright 2012-2013 by Christian Hansen.
+
+    This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.

@@ -7,19 +7,17 @@ sub parse($content) {
     my $error = Any;
     my $res = [];
     my Blob $body = Buf.new;
-    my $header;
     my $parser = HTTP::MultiPartParser.new(
         boundary  => 'xxx'.encode('utf-8'),
         on_header => sub ($h) {
-            $header = $h;
+            $res.push($h, Nil);
         },
         on_body   => sub ($chunk, $final) {
             $body ~= $chunk;
             if $final {
-                $res.push($header, $body);
+                $res[*-1] = $body;
 
                 $body = Buf.new;
-                undefine $header;
             }
         },
         on_error  => sub ($err) { $error ~= "$err"  },
@@ -49,9 +47,9 @@ my @tests = (
     [ "--xxx{CRLF}Foo",
       [ ], 'End of stream encountered while parsing part header' ],
     [ "--xxx{CRLF}{CRLF}{CRLF}",
-      [ [[], Mu] ], 'End of stream encountered while parsing part body' ],
+      [ [[], Nil] ], 'End of stream encountered while parsing part body' ],
     [ "--xxx{CRLF}{CRLF}{CRLF}{CRLF}--xxx--{CRLF}xx",
-      [ [[], ''] ], 'Nonempty epilogue' ],
+      [ [[], Buf.new] ], 'Nonempty epilogue' ],
     [ "--xxx{CRLF}{SP}Foo{CRLF}{CRLF}",
       [ ], 'Continuation line seen before first header' ],
     [ "--xxx{CRLF}{HT}Foo{CRLF}{CRLF}",

@@ -119,21 +119,29 @@ method !parse_header() {
     $!buffer = $!buffer.subbuf( $index + 4 );
 
     my @headers;
-    for $header.split(/\x0d\x0a/) {
-        if /^<-[\x00..\x1F\x7F\:]>+ \: / {
-            @headers.push($_);
-        } elsif /^<[\x09\x20]>+(.*?)$/ {
-            if !@headers {
-                self!err(q/Continuation line seen before first header/);
+
+    # This 'if' statement is workaround for following issue.
+    # > "".split(/\015\012/)
+    # ()
+    # > for "".split(/\015\012/) { .perl.say }
+    # ""
+    if $header.chars > 0 {
+        for $header.split(/\x0d\x0a/) {
+            if /^<-[\x00..\x1F\x7F\:]>+ \: / {
+                @headers.push($_);
+            } elsif /^<[\x09\x20]>+(.*?)$/ {
+                if !@headers {
+                    self!err(q/Continuation line seen before first header/);
+                    return False;
+                }
+                my $value = $/[0].Str;
+                next unless $value.chars > 0;
+                @headers[*-1] ~= ' ' unless @headers[*-1] ~~ /<[\x09\x20]>$/;
+                @headers[*-1] ~= $value;
+            } else {
+                self!err(q/Malformed header line/);
                 return False;
             }
-            my $value = $/[0].Str;
-            next unless $value.chars > 0;
-            @headers[*-1] ~= ' ' unless @headers[*-1] ~~ /<[\x09\x20]>$/;
-            @headers[*-1] ~= $value;
-        } else {
-            self!err(q/Malformed header line/);
-            return False;
         }
     }
 

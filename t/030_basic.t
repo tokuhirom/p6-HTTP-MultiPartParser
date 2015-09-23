@@ -27,6 +27,9 @@ for 1..12 {
             on_header => sub ($h) {
                 $headers = $h;
             },
+            on_error => sub ($err) {
+                die $err;
+            },
             on_body => sub ($chunk, $final) {
                 $body ~= $chunk;
                 if $final {
