@@ -258,7 +258,7 @@ This library is port of chansen's HTTP::MultiPartParser for Perl5.
 
     This library is free software; you can redistribute it and/or modify it under the Artistic License 2.0.
 
-And oritinal perl5's HTTP::MutlipartParser is
+And original perl5's HTTP::MutlipartParser is
 
     Copyright 2012-2013 by Christian Hansen.
 
