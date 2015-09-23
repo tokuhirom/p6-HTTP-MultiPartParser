@@ -1,0 +1,16 @@
+{
+  "name": "HTTP::MultipartParser",
+  "source-url": "",
+  "perl": "v6",
+  "provides": {
+    "HTTP::MultipartParser": "lib/HTTP/MultipartParser.pm6"
+  },
+  "depends": [
+    
+  ],
+  "description": "",
+  "version": "*",
+  "authors": [
+    "Tokuhiro Matsuno"
+  ]
+}
