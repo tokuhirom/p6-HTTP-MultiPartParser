@@ -1,5 +1,5 @@
 use v6;
-unit class HTTP::MultipartParser;
+unit class HTTP::MultiPartParser;
 
 # https://github.com/chansen/p5-http-multipartparser/blob/master/lib/HTTP/MultiPartParser.pm
 
@@ -27,6 +27,8 @@ has Sub $.on_header is required;
 has Sub $.on_error = sub ($err) { die($err) };
 has Sub $.on_body is required;
 has Bool $!finish = False;
+
+has int $.max_header_size = 32768;
 
 has Blob $!boundary-begin = HYPENHYPEN ~ self.boundary;
 has Blob $!boundary-end   = self.boundary ~ HYPENHYPEN;
@@ -113,18 +115,18 @@ method !parse_header() {
         }
     }
 
-    my regex field-name { ^ <-[\x00..\x1f \x7f ()<>@,;:\\"\/?={} \t]>+? }
+#   my regex field-name { ^ <-[\x00..\x1f \x7f ()<>@,;:\\"\/?={} \t]>+? }
 
-    my @results;
+#   my @results;
 
-    for @headers -> $header {
-        if $header ~~ /^(<field-name>)<[\t ]>*\:<[\t ]>*(.*?)$/ {
-            @results.push(($/[0].Str.lc => $/[1].Str.trim));
-        } else {
-            $.on_error.("Malformed header line");
-        }
-    }
-    $.on_header.(@results) if $.on_header;
+#   for @headers -> $header {
+#       if $header ~~ /^(<field-name>)<[\t ]>*\:<[\t ]>*(.*?)$/ {
+#           @results.push(($/[0].Str.lc => $/[1].Str.trim));
+#       } else {
+#           $.on_error.("Malformed header line");
+#       }
+#   }
+    $.on_header.(@headers);
 
     $!state = BODY;
 
@@ -156,7 +158,7 @@ method !parse_body() {
     }
 
     $.on_body.($chunk, $!state == BOUNDARY);
-    return $!state == BOUNDARY;
+    return True;
 }
 
 # RFC 2616 3.7.2 Multipart Types
@@ -207,17 +209,17 @@ method add(Buf $buf) {
 
 =head1 NAME
 
-HTTP::MultipartParser - low level multipart/form-data parser
+HTTP::MultiPartParser - low level multipart/form-data parser
 
 =head1 SYNOPSIS
 
-  use HTTP::MultipartParser;
+  use HTTP::MultiPartParser;
 
 =head1 DESCRIPTION
 
-HTTP::MultipartParser is low level multipart/form-data parser library.
+HTTP::MultiPartParser is low level multipart/form-data parser library.
 
-This library is port of chansen's HTTP::MultipartParser for Perl5.
+This library is port of chansen's HTTP::MultiPartParser for Perl5.
 
 =head1 COPYRIGHT AND LICENSE
 

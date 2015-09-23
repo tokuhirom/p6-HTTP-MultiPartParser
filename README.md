@@ -1,17 +1,17 @@
 NAME
 ====
 
-HTTP::MultipartParser - blah blah blah
+HTTP::MultiPartParser - blah blah blah
 
 SYNOPSIS
 ========
 
-    use HTTP::MultipartParser;
+    use HTTP::MultiPartParser;
 
 DESCRIPTION
 ===========
 
-HTTP::MultipartParser is ...
+HTTP::MultiPartParser is ...
 
 COPYRIGHT AND LICENSE
 =====================
