@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/tokuhirom/p6-HTTP-MultipartParser.svg?branch=master)](https://travis-ci.org/tokuhirom/p6-HTTP-MultipartParser)
+[![Build Status](https://travis-ci.org/tokuhirom/p6-HTTP-MultiPartParser.svg?branch=master)](https://travis-ci.org/tokuhirom/p6-HTTP-MultiPartParser)
 
 NAME
 ====
@@ -24,7 +24,7 @@ COPYRIGHT AND LICENSE
 
     This library is free software; you can redistribute it and/or modify it under the Artistic License 2.0.
 
-And oritinal perl5's HTTP::MutlipartParser is
+And original perl5's HTTP::MutlipartParser is
 
     Copyright 2012-2013 by Christian Hansen.
 
