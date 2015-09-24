@@ -25,7 +25,7 @@ sub parse($content) {
         on_error  => sub ($err) { $error ~= "$err"  },
     );
 
-    $parser.add($content.encode('ascii'));
+    $parser.parse($content.encode('ascii'));
     $parser.finish;
 
     return $res, $error;

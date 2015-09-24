@@ -52,7 +52,7 @@ for 1..12 {
             if $buf.bytes == 0 {
                 last;
             }
-            $parser.add($buf);
+            $parser.parse($buf);
         }
         $parser.finish;
         is @got.elems, $exp.elems;
