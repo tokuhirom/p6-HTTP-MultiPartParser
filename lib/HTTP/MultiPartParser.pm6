@@ -210,7 +210,7 @@ method parse(Blob $buf) {
     self!do-parse;
 }
 
-method !do-parse(Blob $buf) {
+method !do-parse() {
     while ! $!aborted {
         debug($!state);
 
