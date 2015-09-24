@@ -39,12 +39,7 @@ new
 
 This constructor returns a instance of `HTTP::MultiPartParser`. Valid  attributes inculde:
 
-over
-====
-
-4
-
-  * * `boundary` (Mandatory)
+  * `boundary` (Mandatory)
 
     boundary => $value
 
@@ -54,36 +49,31 @@ The unquoted and unescaped *boundary* parameter value from the Content-Type  hea
     "+" / "_" / "," / "-" / "." /
     "/" / ":" / "=" / "?"
 
-  * * `on_header` (Mandatory)
+  * `on_header` (Mandatory)
 
     on_header => sub (Array[Str] $header) { ... }
 
 This callback will be invoked when the header of a part has successfully been  received. The callback will only be invoked once for each part.
 
-  * * `on_body` (Mandatory)
+  * `on_body` (Mandatory)
 
     on_body => sub (Blob $chunk, Bool $final) { ... }
 
 This callback will be invoked when there is any data available for the body  of a part. The callback may be invoked multiple times for each part.
 
-  * * `on_error`
+  * `on_error`
 
     on_error => sub (Blob $message) { ... }
 
 This callback will be invoked anytime an error occurs in the parser. After receiving an error the parser is no longer useful in its current state.
 
-  * * `max_preamble_size`
+  * `max_preamble_size`
 
     max_preamble_size => 32768
 
-  * * `max_header_size`
+  * `max_header_size`
 
     max_header_size => 32768
-
-back
-====
-
-
 
 parse
 -----

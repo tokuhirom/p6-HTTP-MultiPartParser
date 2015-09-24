@@ -273,9 +273,7 @@ This library is port of chansen's HTTP::MultiPartParser for Perl5.
 This constructor returns a instance of C<HTTP::MultiPartParser>. Valid 
 attributes inculde:
 
-=over 4
-
-=item * C<boundary> (Mandatory)
+=item C<boundary> (Mandatory)
 
     boundary => $value
 
@@ -287,36 +285,34 @@ characters as defined in L<RFC 2046|http://tools.ietf.org/html/rfc2046#section-5
     "+" / "_" / "," / "-" / "." /
     "/" / ":" / "=" / "?"
 
-=item * C<on_header> (Mandatory)
+=item C<on_header> (Mandatory)
 
     on_header => sub (Array[Str] $header) { ... }
 
 This callback will be invoked when the header of a part has successfully been 
 received. The callback will only be invoked once for each part.
 
-=item * C<on_body> (Mandatory)
+=item C<on_body> (Mandatory)
 
     on_body => sub (Blob $chunk, Bool $final) { ... }
 
 This callback will be invoked when there is any data available for the body 
 of a part. The callback may be invoked multiple times for each part.
 
-=item * C<on_error>
+=item C<on_error>
 
     on_error => sub (Blob $message) { ... }
 
 This callback will be invoked anytime an error occurs in the parser. After
 receiving an error the parser is no longer useful in its current state.
 
-=item * C<max_preamble_size>
+=item C<max_preamble_size>
 
     max_preamble_size => 32768
 
-=item * C<max_header_size>
+=item C<max_header_size>
 
     max_header_size => 32768
-
-=back
 
 =head2 parse
 
