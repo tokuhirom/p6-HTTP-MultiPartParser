@@ -4,8 +4,6 @@ use Test;
 
 use HTTP::MultiPartParser;
 
-use JSON::Tiny;
-
 my $base = "t/data/";
 
 for 1..12 {
