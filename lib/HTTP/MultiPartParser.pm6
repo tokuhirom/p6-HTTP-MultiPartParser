@@ -3,18 +3,6 @@ unit class HTTP::MultiPartParser;
 
 # https://github.com/chansen/p5-http-multipartparser/blob/master/lib/HTTP/MultiPartParser.pm
 
-constant DEBUGGING = %*ENV<MULTIPART_DEBUGGING>.Bool;
-
-macro debug($message) {
-    if DEBUGGING {
-        quasi {
-            say "[DEBUG] [{$*THREAD.id}] " ~ {{{$message}}};
-        }
-    } else {
-        quasi { }
-    }
-}
-
 my enum State <PREAMBLE BOUNDARY HEADER BODY DONE EPILOGUE>;
 
 constant CRLF = Blob.new(0x0d, 0x0a);
@@ -212,8 +200,6 @@ method parse(Blob $buf) {
 
 method !do-parse() {
     while ! $!aborted {
-        debug($!state);
-
         given $!state {
             when PREAMBLE {
                 return unless self!parse_preamble
