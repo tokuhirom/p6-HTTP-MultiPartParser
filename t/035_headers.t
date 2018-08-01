@@ -19,7 +19,7 @@ sub parse($content) {
                 $res.push($header, $body);
 
                 $body = Buf.new;
-                undefine $header;
+                $header = Nil;
             }
         },
         on_error  => sub ($err) { $error ~= "$err"  },
